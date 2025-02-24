@@ -1,0 +1,34 @@
+[package]
+name = "cloud-hypervisor-client"
+version = "0.3.0" # ON UPDATE: also set this version in generator/workdir/openapi-generator.yaml and regenerate API code!
+authors = ["Lukas Potthast <privat@lukas-potthast.de>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+description = "Unofficial Rust crate for accessing the cloud-hypervisor REST API"
+repository = "https://github.com/lpotthast/cloud-hypervisor-client"
+keywords = ["cloud-hypervisor", "REST-API"]
+categories = ["api-bindings", "web-programming"]
+
+[dependencies]
+base64 = "~0.7.0"
+futures = "^0.3"
+http = "~0.2"
+http-body-util = { version = "0.1.2" }
+hyper = { version = "^1.3.1", features = ["full"] }
+hyper-util = { version = "0.1.5", features = ["client", "client-legacy", "http1", "http2"] }
+hyperlocal = "0.9.1"
+serde = { version = "1.0.207", features = ["derive"] }
+serde_json = "1.0.124"
+serde_repr = "0.1.19"
+serde_with = { version = "3.9.0", default-features = false, features = [
+    "base64",
+    "std",
+    "macros",
+] }
+url = "2.5.2"
+uuid = { version = "1.10.0", features = ["serde", "v4"] }
+
+[dev-dependencies]
+rand = "0.8.5"
+tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }

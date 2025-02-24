@@ -1,0 +1,4 @@
+/target
+
+/workdir/download/**
+/workdir/output/**
