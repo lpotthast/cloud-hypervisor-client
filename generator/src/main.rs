@@ -147,16 +147,19 @@ async fn main() -> Result<()> {
     )
     .await?;
 
-    clear_directory(dirs.templates_original_dir()).await?;
-
     let java_cmd = find_java().await?;
     tracing::info!("Using Java command: '{java_cmd}'");
     tracing::info!("Using generator jar: '{}'", generator_jar.display());
 
-    // Remove output directory first
-    let _ = fs::remove_dir_all("templates_orig");
-
     tracing::info!("Running OpenAPI Generator template extraction...");
+    clear_directory(dirs.templates_original_dir())
+        .await
+        .with_context(|| {
+            format!(
+                "Failed to clear {} directory",
+                dirs.templates_original_dir().display()
+            )
+        })?;
     let output = Command::new(&java_cmd)
         .arg("-jar")
         .arg(&generator_jar)
@@ -174,9 +177,10 @@ async fn main() -> Result<()> {
         ));
     }
 
-    clear_directory(dirs.output_dir()).await?;
-
     tracing::info!("Running OpenAPI Generator code generation...");
+    clear_directory(dirs.output_dir())
+        .await
+        .with_context(|| format!("Failed to clear {} directory", dirs.output_dir().display()))?;
     // see: https://openapi-generator.tech/docs/usage#generate
     let output = Command::new(&java_cmd)
         .arg("-jar")
