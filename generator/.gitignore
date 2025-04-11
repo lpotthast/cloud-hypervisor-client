@@ -1,4 +1,5 @@
 /target
 
-/workdir/download/**
-/workdir/output/**
+/download/**
+!/download/.gitkeep
+/output/**

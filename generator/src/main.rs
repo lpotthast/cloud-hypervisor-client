@@ -13,12 +13,12 @@ use tokio::process::Command;
 use yaml_rust2::YamlLoader;
 
 struct Dirs {
-    download_dir: PathBuf,
+    lib_dir: PathBuf,
+    workdir: PathBuf,
+    downloads: PathBuf,
     templates_dir: PathBuf,
     templates_original_dir: PathBuf,
     output_dir: PathBuf,
-    lib_dir: PathBuf,
-    openapi_generator_yaml: PathBuf,
 }
 
 impl Dirs {
@@ -26,58 +26,54 @@ impl Dirs {
         let workdir = PathBuf::from("workdir");
         let workdir_abs = workdir.canonicalize()?;
 
-        let download_dir = workdir.join("download");
-        let templates_dir = workdir.join("templates");
-        let templates_original_dir = workdir.join("templates_original");
-        let output_dir = workdir.join("output");
         let lib_dir = workdir_abs.parent().unwrap().parent().unwrap().to_owned();
-        let openapi_generator_yaml = workdir.join("openapi-generator.yaml");
+        let downloads = workdir.join("downloads");
+        let templates = workdir.join("templates");
+        let templates_original = workdir.join("templates_original");
+        let output = workdir.join("output");
 
-        fs::create_dir_all(&download_dir).await?;
-        fs::create_dir_all(&templates_dir).await?;
-        fs::create_dir_all(&templates_original_dir).await?;
-        fs::create_dir_all(&output_dir).await?;
+        fs::create_dir_all(&downloads).await?;
+        fs::create_dir_all(&templates).await?;
+        fs::create_dir_all(&templates_original).await?;
+        fs::create_dir_all(&output).await?;
 
-        assert_that(openapi_generator_yaml.as_path())
-            .exists()
-            .is_a_file();
-
+        // Sanity-check. Repo must be checked out as "cloud-hypervisor-client" to pass this though.
         assert_that(lib_dir.as_path())
             .exists()
             .is_a_directory()
             .has_file_name("cloud-hypervisor-client");
 
         Ok(Self {
-            download_dir,
-            templates_dir,
-            templates_original_dir,
-            output_dir,
             lib_dir,
-            openapi_generator_yaml,
+            workdir,
+            downloads,
+            templates_dir: templates,
+            templates_original_dir: templates_original,
+            output_dir: output,
         })
     }
 
-    pub fn openapi_generator_yaml(&self) -> &Path {
-        self.openapi_generator_yaml.as_path()
+    pub fn workdir(&self) -> &Path {
+        self.workdir.as_path()
     }
 
-    pub fn download_dir(&self) -> &Path {
-        self.download_dir.as_path()
+    pub fn downloads(&self) -> &Path {
+        self.downloads.as_path()
     }
 
-    pub fn templates_dir(&self) -> &Path {
+    pub fn templates(&self) -> &Path {
         self.templates_dir.as_path()
     }
 
-    pub fn templates_original_dir(&self) -> &Path {
+    pub fn templates_original(&self) -> &Path {
         self.templates_original_dir.as_path()
     }
 
-    pub fn output_dir(&self) -> &Path {
+    pub fn output(&self) -> &Path {
         self.output_dir.as_path()
     }
 
-    pub fn lib_dir(&self) -> &Path {
+    pub fn lib(&self) -> &Path {
         self.lib_dir.as_path()
     }
 }
@@ -102,16 +98,21 @@ async fn main() -> Result<()> {
 
     let dirs = Dirs::init().await?;
 
+    let openapi_generator_yaml = dirs.workdir().join("openapi-generator.yaml");
+    assert_that(openapi_generator_yaml.as_path())
+        .exists()
+        .is_a_file();
+
     let generator_version = "7.9.0";
     let generator_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar");
     let generator_sha1_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar.sha1");
     let generator_jar = dirs
-        .download_dir()
+        .downloads()
         .join(format!("openapi-generator-cli-{generator_version}.jar"));
 
     let cloud_hypervisor_openapi_expected_version = "0.3.0";
     let cloud_hypervisor_openapi_url = "https://raw.githubusercontent.com/cloud-hypervisor/cloud-hypervisor/master/vmm/src/api/openapi/cloud-hypervisor.yaml";
-    let cloud_hypervisor_openapi_spec = dirs.download_dir().join(format!(
+    let cloud_hypervisor_openapi_spec = dirs.downloads().join(format!(
         "cloud-hypervisor_{cloud_hypervisor_openapi_expected_version}.yaml"
     ));
 
@@ -152,12 +153,12 @@ async fn main() -> Result<()> {
     tracing::info!("Using generator jar: '{}'", generator_jar.display());
 
     tracing::info!("Running OpenAPI Generator template extraction...");
-    clear_directory(dirs.templates_original_dir())
+    clear_directory(dirs.templates_original())
         .await
         .with_context(|| {
             format!(
                 "Failed to clear {} directory",
-                dirs.templates_original_dir().display()
+                dirs.templates_original().display()
             )
         })?;
     let output = Command::new(&java_cmd)
@@ -168,7 +169,7 @@ async fn main() -> Result<()> {
         .arg("-g")
         .arg("rust")
         .arg("-o")
-        .arg(dirs.templates_original_dir())
+        .arg(dirs.templates_original())
         .output()
         .await?;
     if !output.status.success() {
@@ -178,9 +179,9 @@ async fn main() -> Result<()> {
     }
 
     tracing::info!("Running OpenAPI Generator code generation...");
-    clear_directory(dirs.output_dir())
+    clear_directory(dirs.output())
         .await
-        .with_context(|| format!("Failed to clear {} directory", dirs.output_dir().display()))?;
+        .with_context(|| format!("Failed to clear {} directory", dirs.output().display()))?;
     // see: https://openapi-generator.tech/docs/usage#generate
     let output = Command::new(&java_cmd)
         .arg("-jar")
@@ -193,11 +194,11 @@ async fn main() -> Result<()> {
         .arg("--generator-name")
         .arg("rust")
         .arg("--config")
-        .arg(dirs.openapi_generator_yaml())
+        .arg(openapi_generator_yaml)
         .arg("--template-dir")
-        .arg(dirs.templates_dir())
+        .arg(dirs.templates())
         .arg("--output")
-        .arg(dirs.output_dir())
+        .arg(dirs.output())
         .output()
         .await
         .context("Failed to run OpenAPI generator")?;
@@ -209,8 +210,8 @@ async fn main() -> Result<()> {
 
     tracing::info!("Cleaning up old generated code. Keeping lib.rs...");
     for dir in &[
-        dirs.lib_dir().join("src").join("apis"),
-        dirs.lib_dir().join("src").join("models"),
+        dirs.lib().join("src").join("apis"),
+        dirs.lib().join("src").join("models"),
     ] {
         if dir.exists() {
             fs::remove_dir_all(&dir)
@@ -221,20 +222,20 @@ async fn main() -> Result<()> {
 
     tracing::info!("Copying generated sources...");
     fs::rename(
-        dirs.output_dir().join("src").join("apis"),
-        dirs.lib_dir().join("src").join("apis"),
+        dirs.output().join("src").join("apis"),
+        dirs.lib().join("src").join("apis"),
     )
     .await?;
     fs::rename(
-        dirs.output_dir().join("src").join("models"),
-        dirs.lib_dir().join("src").join("models"),
+        dirs.output().join("src").join("models"),
+        dirs.lib().join("src").join("models"),
     )
     .await?;
 
     tracing::info!("Formatting generated code...");
     let output = Command::new("cargo")
         .arg("fmt")
-        .current_dir(dirs.lib_dir())
+        .current_dir(dirs.lib())
         .output()
         .await
         .context("Failed to run `cargo fmt`")?;
@@ -259,9 +260,9 @@ async fn run_git_diff(dirs: &Dirs) -> Result<bool> {
         .arg("--no-index")
         .arg("--diff-filter=M")
         .arg("--output")
-        .arg(dirs.templates_dir().join("templates.diff"))
-        .arg(dirs.templates_original_dir())
-        .arg(dirs.templates_dir())
+        .arg(dirs.workdir().join("templates.diff"))
+        .arg(dirs.templates_original())
+        .arg(dirs.templates())
         .output()
         .await
         .context("Failed to run `git diff` on templates")?;
