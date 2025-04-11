@@ -13,8 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DiskConfig {
-    #[serde(rename = "path")]
-    pub path: String,
+    #[serde(rename = "path", skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
     #[serde(rename = "readonly", skip_serializing_if = "Option::is_none")]
     pub readonly: Option<bool>,
     #[serde(rename = "direct", skip_serializing_if = "Option::is_none")]
@@ -47,9 +47,9 @@ pub struct DiskConfig {
 }
 
 impl DiskConfig {
-    pub fn new(path: String) -> DiskConfig {
+    pub fn new() -> DiskConfig {
         DiskConfig {
-            path,
+            path: None,
             readonly: None,
             direct: None,
             iommu: None,

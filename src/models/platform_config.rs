@@ -17,6 +17,11 @@ pub struct PlatformConfig {
     pub num_pci_segments: Option<i32>,
     #[serde(rename = "iommu_segments", skip_serializing_if = "Option::is_none")]
     pub iommu_segments: Option<Vec<i32>>,
+    #[serde(
+        rename = "iommu_address_width",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub iommu_address_width: Option<i32>,
     #[serde(rename = "serial_number", skip_serializing_if = "Option::is_none")]
     pub serial_number: Option<String>,
     #[serde(rename = "uuid", skip_serializing_if = "Option::is_none")]
@@ -25,6 +30,8 @@ pub struct PlatformConfig {
     pub oem_strings: Option<Vec<String>>,
     #[serde(rename = "tdx", skip_serializing_if = "Option::is_none")]
     pub tdx: Option<bool>,
+    #[serde(rename = "sev_snp", skip_serializing_if = "Option::is_none")]
+    pub sev_snp: Option<bool>,
 }
 
 impl PlatformConfig {
@@ -32,10 +39,12 @@ impl PlatformConfig {
         PlatformConfig {
             num_pci_segments: None,
             iommu_segments: None,
+            iommu_address_width: None,
             serial_number: None,
             uuid: None,
             oem_strings: None,
             tdx: None,
+            sev_snp: None,
         }
     }
 }

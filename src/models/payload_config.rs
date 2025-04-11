@@ -22,6 +22,10 @@ pub struct PayloadConfig {
     pub cmdline: Option<String>,
     #[serde(rename = "initramfs", skip_serializing_if = "Option::is_none")]
     pub initramfs: Option<String>,
+    #[serde(rename = "igvm", skip_serializing_if = "Option::is_none")]
+    pub igvm: Option<String>,
+    #[serde(rename = "host_data", skip_serializing_if = "Option::is_none")]
+    pub host_data: Option<String>,
 }
 
 impl PayloadConfig {
@@ -32,6 +36,8 @@ impl PayloadConfig {
             kernel: None,
             cmdline: None,
             initramfs: None,
+            igvm: None,
+            host_data: None,
         }
     }
 }
