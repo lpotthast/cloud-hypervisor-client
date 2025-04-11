@@ -4,11 +4,13 @@ use anyhow::{anyhow, Context, Result};
 use assertr::prelude::*;
 use futures_util::StreamExt;
 use reqwest::IntoUrl;
+use sha1::Digest;
 use std::path::{Path, PathBuf};
 use tokio::fs;
 use tokio::fs::OpenOptions;
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::process::Command;
+use yaml_rust2::YamlLoader;
 
 struct Dirs {
     download_dir: PathBuf,
@@ -100,42 +102,56 @@ async fn main() -> Result<()> {
 
     let dirs = Dirs::init().await?;
 
-    let generator_version = "7.8.0"; // TODO: 7.9.0 is now available
+    let generator_version = "7.9.0";
     let generator_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar");
+    let generator_sha1_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar.sha1");
     let generator_jar = dirs
         .download_dir()
         .join(format!("openapi-generator-cli-{generator_version}.jar"));
 
-    let cloud_hypervisor_openapi_version = "0.3.0";
+    let cloud_hypervisor_openapi_expected_version = "0.3.0";
     let cloud_hypervisor_openapi_url = "https://raw.githubusercontent.com/cloud-hypervisor/cloud-hypervisor/master/vmm/src/api/openapi/cloud-hypervisor.yaml";
     let cloud_hypervisor_openapi_spec = dirs.download_dir().join(format!(
-        "cloud-hypervisor_{cloud_hypervisor_openapi_version}.yaml"
+        "cloud-hypervisor_{cloud_hypervisor_openapi_expected_version}.yaml"
     ));
 
-    tracing::info!("Downloading version {cloud_hypervisor_openapi_version} of the OpenAPI spec for the cloud-hypervisor REST API...");
+    tracing::info!("Downloading version {cloud_hypervisor_openapi_expected_version} of the OpenAPI spec for the cloud-hypervisor REST API...");
     let spec = reqwest::get(cloud_hypervisor_openapi_url)
         .await
         .with_context(|| format!("Failed to download: {cloud_hypervisor_openapi_url}"))?
         .text()
         .await
         .context("Failed to extract test from response")?;
-    let mut spec_file = OpenOptions::new()
+    let parsed = YamlLoader::load_from_str(&spec).context("Failed to parse YAML")?;
+    let parsed_version = parsed[0]["info"]["version"]
+        .as_str()
+        .context("Failed to parse version")?;
+    assert_that(parsed_version).is_equal_to(cloud_hypervisor_openapi_expected_version);
+
+    OpenOptions::new()
         .create(true)
         .truncate(true)
         .write(true)
         .append(false)
         .open(&cloud_hypervisor_openapi_spec)
         .await
-        .with_context(|| format!("Failed to open: {cloud_hypervisor_openapi_spec:?}"))?;
-    spec_file.write_all(spec.as_bytes()).await?;
-
-    download_generator_jar_if_missing(generator_version, generator_url, generator_jar.as_path())
+        .with_context(|| format!("Failed to open: {cloud_hypervisor_openapi_spec:?}"))?
+        .write_all(spec.as_bytes())
         .await?;
+
+    download_generator_jar_if_missing(
+        generator_version,
+        generator_url,
+        generator_sha1_url,
+        generator_jar.as_path(),
+    )
+    .await?;
 
     clear_directory(dirs.templates_original_dir()).await?;
 
     let java_cmd = find_java().await?;
     tracing::info!("Using Java command: '{java_cmd}'");
+    tracing::info!("Using generator jar: '{}'", generator_jar.display());
 
     // Remove output directory first
     let _ = fs::remove_dir_all("templates_orig");
@@ -281,17 +297,20 @@ async fn find_java() -> Result<String> {
 async fn download_generator_jar_if_missing(
     version: &str,
     url: impl IntoUrl,
+    sha1_url: impl IntoUrl,
     dst: &Path,
 ) -> Result<()> {
     if !(dst.exists() && dst.is_file()) {
         tracing::info!("Downloading version {version} of the OpenAPI Generator...",);
-        download_generator_jar(url, dst).await?;
+        let sha1_hash = download_generator_jar(url, dst).await?;
+        let expected_sha1_hash = reqwest::get(sha1_url).await?.text().await?;
+        assert_that(sha1_hash).is_equal_to(expected_sha1_hash);
         tracing::info!("Downloading version {version} of the OpenAPI Generator... DONE.",);
     }
     Ok(())
 }
 
-async fn download_generator_jar(url: impl IntoUrl, dst: &Path) -> Result<()> {
+async fn download_generator_jar(url: impl IntoUrl, dst: &Path) -> Result<String> {
     let generator_file = OpenOptions::new()
         .create(true)
         .truncate(true)
@@ -305,9 +324,13 @@ async fn download_generator_jar(url: impl IntoUrl, dst: &Path) -> Result<()> {
         .await
         .context("Failed to download OpenAPI Generator")?
         .bytes_stream();
+
+    let mut hasher = sha1::Sha1::new();
     while let Some(bytes) = stream.next().await {
         let bytes = bytes?;
+        hasher.update(&bytes);
         writer.write_all(&bytes).await?;
     }
-    Ok(())
+    writer.flush().await?;
+    Ok(hex::encode(hasher.finalize()))
 }
