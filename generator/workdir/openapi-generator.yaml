@@ -1,5 +1,8 @@
 httpUserAgent: cloud-hypervisor-client/0.3.0
 library: hyper
 avoidBoxedModels: true
+bestFitInt: true
 supportAsync: true
 useSingleRequestParameter: true
+packageName: cloud-hypervisor-client
+packageVersion: 0.3.0

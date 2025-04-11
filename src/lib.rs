@@ -11,14 +11,14 @@
 //!Get information about a VM:
 //!
 //!```rust,no_run
-//! use cloud_hypervisor_client::apis::configuration::Configuration;
-//! use cloud_hypervisor_client::apis::default_api::vm_info_get;
+//! use cloud_hypervisor_client::apis::DefaultApi;
+//! use cloud_hypervisor_client::socket_based_api_client;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), String> {
-//!     let configuration = Configuration::new();
+//!     let client = socket_based_api_client("cloud_hypervisor_vm_socket.sock");
 //!
-//!     let vm_info = vm_info_get(&configuration)
+//!     let vm_info = client.vm_info_get()
 //!         .await
 //!         .map_err(|err| format!("API call to vm_info_get failed: {:?}", err))?;
 //!
@@ -70,10 +70,9 @@ pub fn socket_based_api_client(vmm_socket_path: impl AsRef<Path>) -> SocketBased
     use hyperlocal::UnixClientExt;
 
     let uri: hyper::Uri = hyperlocal::Uri::new(vmm_socket_path, "/api/v1").into();
-    let base_path = uri.to_string();
     let client = hyper_util::client::legacy::Client::unix();
     let configuration = Configuration {
-        base_path: base_path.clone(),
+        base_path: uri.to_string(),
         user_agent: None,
         client,
         basic_auth: None,

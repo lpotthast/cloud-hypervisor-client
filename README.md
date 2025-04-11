@@ -37,7 +37,7 @@ async fn main() -> Result<(), String> {
 For more examples check out the [examples](https://github.com/HenningHolmDE/hcloud-rust/tree/master/examples) folder in
 the Git repository.
 
-## Selecting TLS implementation
+## Selecting a TLS implementation
 
 The underlying TLS implementation for `reqwest` can be selected
 using [Cargo features](https://doc.rust-lang.org/stable/cargo/reference/manifest.html#the-features-section):
