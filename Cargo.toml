@@ -1,6 +1,6 @@
 [package]
 name = "cloud-hypervisor-client"
-version = "0.3.0" # ON UPDATE: also set this version in generator/workdir/openapi-generator.yaml and regenerate API code!
+version = "0.3.0"
 authors = ["Lukas Potthast <privat@lukas-potthast.de>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
