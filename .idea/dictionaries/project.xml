@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>coredump</w>
+      <w>thiserror</w>
       <w>vdpa</w>
       <w>virt</w>
     </words>

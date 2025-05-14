@@ -26,6 +26,7 @@ serde_with = { version = "3.9.0", default-features = false, features = [
     "std",
     "macros",
 ] }
+thiserror = "2.0.12"
 url = "2.5.2"
 uuid = { version = "1.10.0", features = ["serde", "v4"] }
 

@@ -6,14 +6,21 @@ use hyper::http;
 use hyper_util::client::legacy::connect::Connect;
 use serde_json;
 
-#[derive(Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("ApiError: {0:?}")]
     Api(ApiError),
+    #[error("InvalidHeaderValue: {0}")]
     Header(http::header::InvalidHeaderValue),
+    #[error("Http: {0}")]
     Http(http::Error),
+    #[error("Hyper: {0}")]
     Hyper(hyper::Error),
+    #[error("HyperClient: {0}")]
     HyperClient(hyper_util::client::legacy::Error),
+    #[error("serde_json::Error: {0}")]
     Serde(serde_json::Error),
+    #[error("InvalidUri: {0}")]
     UriError(http::uri::InvalidUri),
 }
 
