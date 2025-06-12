@@ -15,8 +15,10 @@ use serde::{Deserialize, Serialize};
 pub struct NetConfig {
     #[serde(rename = "tap", skip_serializing_if = "Option::is_none")]
     pub tap: Option<String>,
+    /// IPv4 or IPv6 address
     #[serde(rename = "ip", skip_serializing_if = "Option::is_none")]
     pub ip: Option<String>,
+    /// Must be a valid IPv4 netmask if ip is an IPv4 address or a valid IPv6 netmask if ip is an IPv6 address.
     #[serde(rename = "mask", skip_serializing_if = "Option::is_none")]
     pub mask: Option<String>,
     #[serde(rename = "mac", skip_serializing_if = "Option::is_none")]
