@@ -1,4 +1,4 @@
-# cloud-hypervisor-client for Rust
+# cloud-hypervisor-client
 
 Unofficial Rust crate for interacting with
 the [cloud-hypervisor REST API](https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/docs/api.md)
