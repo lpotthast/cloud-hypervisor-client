@@ -103,7 +103,7 @@ async fn main() -> Result<()> {
         .exists()
         .is_a_file();
 
-    let generator_version = "7.9.0";
+    let generator_version = "7.12.0";
     let generator_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar");
     let generator_sha1_url = format!("https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/{generator_version}/openapi-generator-cli-{generator_version}.jar.sha1");
     let generator_jar = dirs
