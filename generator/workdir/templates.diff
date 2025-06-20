@@ -1,8 +1,29 @@
 diff --git a/workdir/templates_original/hyper/api_mod.mustache b/workdir/templates/hyper/api_mod.mustache
-index 67baa44..d15dd73 100644
+index 67baa44..723baaa 100644
 --- a/workdir/templates_original/hyper/api_mod.mustache
 +++ b/workdir/templates/hyper/api_mod.mustache
-@@ -19,20 +19,20 @@ pub enum Error {
+@@ -6,33 +6,40 @@ use hyper::http;
+ use hyper_util::client::legacy::connect::Connect;
+ use serde_json;
+ 
+-#[derive(Debug)]
++#[derive(thiserror::Error, Debug)]
+ pub enum Error {
++    #[error("ApiError: {0:?}")]
+     Api(ApiError),
++    #[error("InvalidHeaderValue: {0}")]
+     Header(http::header::InvalidHeaderValue),
++    #[error("Http error: {0}")]
+     Http(http::Error),
++    #[error("Hyper error: {0}")]
+     Hyper(hyper::Error),
++    #[error("HyperClient error: {0}")]
+     HyperClient(hyper_util::client::legacy::Error),
++    #[error("serde_json error: {0}")]
+     Serde(serde_json::Error),
++    #[error("InvalidUri: {0}")]
+     UriError(http::uri::InvalidUri),
+ }
  
  pub struct ApiError {
      pub code: hyper::StatusCode,
