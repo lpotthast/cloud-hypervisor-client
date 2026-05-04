@@ -38,7 +38,7 @@ impl Dirs {
         fs::create_dir_all(&output).await?;
 
         // Sanity-check. Repo must be checked out as "cloud-hypervisor-client" to pass this though.
-        assert_that(lib_dir.as_path())
+        assert_that!(lib_dir.as_path())
             .exists()
             .is_a_directory()
             .has_file_name("cloud-hypervisor-client");
@@ -79,7 +79,7 @@ impl Dirs {
 }
 
 pub async fn clear_directory(dir: &Path) -> Result<()> {
-    assert_that(dir).is_a_directory();
+    assert_that!(dir).is_a_directory();
     let mut read_dir = fs::read_dir(dir).await?;
     while let Some(entry) = read_dir.next_entry().await? {
         let path = entry.path();
@@ -99,7 +99,7 @@ async fn main() -> Result<()> {
     let dirs = Dirs::init().await?;
 
     let openapi_generator_yaml = dirs.workdir().join("openapi-generator.yaml");
-    assert_that(openapi_generator_yaml.as_path())
+    assert_that!(openapi_generator_yaml.as_path())
         .exists()
         .is_a_file();
 
@@ -127,7 +127,7 @@ async fn main() -> Result<()> {
     let parsed_version = parsed[0]["info"]["version"]
         .as_str()
         .context("Failed to parse version")?;
-    assert_that(parsed_version).is_equal_to(cloud_hypervisor_openapi_expected_version);
+    assert_that!(parsed_version).is_equal_to(cloud_hypervisor_openapi_expected_version);
 
     OpenOptions::new()
         .create(true)
@@ -309,7 +309,7 @@ async fn download_generator_jar_if_missing(
         tracing::info!("Downloading version {version} of the OpenAPI Generator...",);
         let sha1_hash = download_generator_jar(url, dst).await?;
         let expected_sha1_hash = reqwest::get(sha1_url).await?.text().await?;
-        assert_that(sha1_hash).is_equal_to(expected_sha1_hash);
+        assert_that!(sha1_hash).is_equal_to(expected_sha1_hash);
         tracing::info!("Downloading version {version} of the OpenAPI Generator... DONE.",);
     }
     Ok(())

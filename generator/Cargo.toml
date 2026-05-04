@@ -5,13 +5,13 @@ edition = "2024"
 publish = false
 
 [dependencies]
-anyhow = "1.0.98"
-assertr = "0.3.1"
-futures-util = "0.3.31"
+anyhow = "1.0.102"
+assertr = "0.6.0"
+futures-util = "0.3.32"
 hex = "0.4.3"
-reqwest = { version = "0.12.20", default-features = false, features = ["rustls-tls", "stream"] }
-sha1 = "0.10.6"
-tokio = { version = "1.45.1", features = ["full"] }
-tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
-yaml-rust2 = "0.10.3"
+reqwest = { version = "0.13.3", default-features = false, features = ["rustls", "stream"] }
+sha1 = "0.11.0"
+tokio = { version = "1.52.1", features = ["full"] }
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
+yaml-rust2 = "0.11.0"
