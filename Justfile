@@ -3,5 +3,19 @@
 default:
   just --list
 
+# Install dependencies for maintenance work, profiling and more...
+install-tools:
+  cargo +stable install --locked cargo-minimal-versions
+  cargo +stable install --locked cargo-msrv
+
+# Generate the library source using our `generator/`.
 gen:
   cd ./generator && cargo run
+
+# Find the minimum supported rust version.
+msrv:
+    cargo msrv find
+
+# Check if the current dependency version bounds are sufficient.
+minimal-versions:
+    cargo minimal-versions check --workspace --direct

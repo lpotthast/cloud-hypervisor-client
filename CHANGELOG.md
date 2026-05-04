@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
+- **Breaking.** Bumped MSRV from `1.81.0` to `1.86.0` and migrated the library crate to Rust edition 2024.
 - **Breaking.** Dropped HTTP authentication from the public surface. `apis::configuration::Configuration` no
   longer exposes `basic_auth`, `oauth_access_token`, or `api_key`, and the `BasicAuth` alias and `ApiKey` struct
   are gone. The cloud-hypervisor REST API speaks over a Unix domain socket and defines no `securitySchemes`, so

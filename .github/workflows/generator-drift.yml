@@ -1,0 +1,86 @@
+name: generator-drift
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: generator-drift-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: generator
+
+      - name: Run generator
+        run: cargo run --locked --manifest-path generator/Cargo.toml 2>&1 | tee generator.log
+
+      - name: Check for outdated OpenAPI Generator jar
+        id: outdated
+        run: |
+          if grep -F "A newer OpenAPI Generator release is available" generator.log; then
+            {
+              echo "## Outdated OpenAPI Generator jar"
+              echo
+              echo "Maven Central reports a newer release than the pinned version."
+              echo "Bump \`OPENAPI_GENERATOR_VERSION\` in \`generator/src/generator_jar.rs\`."
+              echo
+              echo '```'
+              grep -F "A newer OpenAPI Generator release is available" generator.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "OUTDATED=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check for drift in committed sources
+        id: drift
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            {
+              echo "## Generator drift detected"
+              echo
+              echo "Regenerated outputs differ from the committed tree. Run \`just gen\` locally"
+              echo "and commit the result."
+              echo
+              echo '### git status'
+              echo '```'
+              git status --short
+              echo '```'
+              echo
+              echo '### git diff --stat'
+              echo '```'
+              git diff --stat
+              echo '```'
+              echo
+              git diff > /tmp/generator.diff
+              echo '### git diff (first 200 lines)'
+              echo '```diff'
+              head -n 200 /tmp/generator.diff
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "DRIFT=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Fail if drift or outdated jar
+        run: |
+          if [ "${OUTDATED:-0}" = "1" ] || [ "${DRIFT:-0}" = "1" ]; then
+            echo "Generator drift or outdated jar detected. See the run summary."
+            exit 1
+          fi

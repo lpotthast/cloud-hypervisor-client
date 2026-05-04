@@ -2,16 +2,16 @@ use std::collections::HashMap;
 use std::pin::Pin;
 
 use futures;
-use futures::future::*;
 use futures::Future;
+use futures::future::*;
 use http_body_util::BodyExt;
 use hyper;
-use hyper::header::{HeaderValue, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
+use hyper::header::{CONTENT_LENGTH, CONTENT_TYPE, HeaderValue, USER_AGENT};
 use hyper_util::client::legacy::connect::Connect;
 use serde;
 use serde_json;
 
-use super::{configuration, Error};
+use super::{Error, configuration};
 
 pub(crate) struct Request {
     method: hyper::Method,

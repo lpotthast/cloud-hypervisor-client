@@ -13,7 +13,7 @@ for it.
 
 There are two Cargo packages, not configured as a workspace:
 
-- Repo root: the published library crate (`cloud-hypervisor-client`, edition 2021, MSRV 1.81.0).
+- Repo root: the published library crate (`cloud-hypervisor-client`, edition 2024, MSRV 1.86.0).
 - `generator/`: a separate, unpublished binary crate (edition 2024) that regenerates the library's API/model code
   from the upstream OpenAPI spec. It is not a path-dependency of the library.
 
@@ -92,9 +92,3 @@ The generator is `generator/src/main.rs`. The flow:
   Commit the regenerated `src/` together with the template/config change in the same commit (see commit
   b1c3cb0 for the established pattern).
 
-## Things to ignore in `src/apis/` and `src/models/`
-
-The `Configuration` struct still references `reqwest`-style TLS features in doc comments and the README
-mentions Cargo features (`default-tls`, `native-tls`, `rustls-tls`) that are not actually declared in
-`Cargo.toml`. The runtime client is hyper-only via `hyperlocal::UnixConnector`. Treat those doc fragments
-as upstream template artifacts rather than features to wire up.

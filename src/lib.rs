@@ -28,23 +28,8 @@
 //! }
 //!```
 //!
-//! For more examples check out the [examples](https://github.com/lpotthast/cloud-hypervisor-client) folder in the Git repository.
-//!
-//!# Selecting TLS implementation
-//!
-//!The underlying TLS implementation for `reqwest` can be selected using [Cargo features](https://doc.rust-lang.org/stable/cargo/reference/manifest.html#the-features-section):
-//!- **default-tls** *(enabled by default)*: Provides TLS support to connect over HTTPS.
-//!- **native-tls**: Enables TLS functionality provided by `native-tls`.
-//!- **native-tls-vendored**: Enables the `vendored` feature of `native-tls`.
-//!- **rustls-tls**: Enables TLS functionality provided by `rustls`.
-//!
-//!(Refer to [Optional Features](https://docs.rs/reqwest/latest/reqwest/#optional-features) in the `reqwest` documentation.)
-//!
-//!Example for using the TLS functionality provided by `rustls`:
-//!```toml
-//![dependencies]
-//!cloud_hypervisor_client = { version = "*", default-features = false, features = ["rustls-tls"] }
-//!```
+//! For more examples check out the [examples](https://github.com/lpotthast/cloud-hypervisor-client/tree/main/examples)
+//! folder in the Git repository.
 
 #![allow(unused_imports)]
 #![allow(clippy::too_many_arguments)]
@@ -56,8 +41,8 @@ extern crate serde_json;
 extern crate serde_repr;
 extern crate url;
 
-use crate::apis::configuration::Configuration;
 use crate::apis::DefaultApiClient;
+use crate::apis::configuration::Configuration;
 use std::path::Path;
 use std::sync::Arc;
 

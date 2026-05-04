@@ -9,9 +9,9 @@
  */
 
 use hyper;
+use hyper_util::client::legacy::Client;
 use hyper_util::client::legacy::connect::Connect;
 use hyper_util::client::legacy::connect::HttpConnector;
-use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
 
 pub struct Configuration<C: Connect = HttpConnector>

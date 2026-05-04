@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/cloud-hypervisor-client.svg)](https://crates.io/crates/cloud-hypervisor-client)
 [![Docs.rs](https://docs.rs/cloud-hypervisor-client/badge.svg)](https://docs.rs/cloud-hypervisor-client)
 [![CI](https://github.com/lpotthast/cloud-hypervisor-client/actions/workflows/ci.yml/badge.svg)](https://github.com/lpotthast/cloud-hypervisor-client/actions/workflows/ci.yml)
-[![MSRV](https://img.shields.io/badge/MSRV-1.81.0-blue.svg)](https://github.com/lpotthast/cloud-hypervisor-client/blob/main/Cargo.toml)
+[![MSRV](https://img.shields.io/badge/MSRV-1.86.0-blue.svg)](https://github.com/lpotthast/cloud-hypervisor-client/blob/main/Cargo.toml)
 [![License](https://img.shields.io/crates/l/cloud-hypervisor-client.svg)](https://github.com/lpotthast/cloud-hypervisor-client#license)
 
 Unofficial Rust crate for interacting with
@@ -59,12 +59,12 @@ async fn main() -> Result<(), String> {
 }
 ```
 
-For more examples check out the [examples](https://github.com/HenningHolmDE/hcloud-rust/tree/master/examples) folder in
-the Git repository.
+For more examples check out the [examples](https://github.com/lpotthast/cloud-hypervisor-client/tree/main/examples)
+folder in the Git repository.
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate's MSRV is `1.81.0`.
+This crate's MSRV is `1.86.0`.
 
 ## Attributions
 

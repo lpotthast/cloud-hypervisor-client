@@ -2,14 +2,14 @@
 name = "cloud-hypervisor-client"
 version = "0.4.0+api-spec-0.3.0-2026-05-04"
 authors = ["Lukas Potthast <privat@lukas-potthast.de>"]
-edition = "2021"
-rust-version = "1.81.0"
+edition = "2024"
+rust-version = "1.86.0"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-description = "Unofficial Rust crate for accessing the cloud-hypervisor REST API"
+description = "Unofficial Rust crate for accessing the cloud-hypervisor REST API."
 repository = "https://github.com/lpotthast/cloud-hypervisor-client"
-keywords = ["cloud-hypervisor", "REST-API"]
-categories = ["api-bindings", "web-programming"]
+keywords = ["cloud-hypervisor", "hypervisor", "virtualization", "vmm", "REST-API"]
+categories = ["api-bindings", "virtualization", "web-programming::http-client"]
 
 [dependencies]
 futures = "^0.3"

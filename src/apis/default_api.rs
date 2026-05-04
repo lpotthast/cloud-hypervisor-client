@@ -19,7 +19,7 @@ use hyper;
 use hyper_util::client::legacy::connect::Connect;
 
 use super::request as __internal_request;
-use super::{configuration, Error};
+use super::{Error, configuration};
 use crate::models;
 
 pub struct DefaultApiClient<C: Connect>

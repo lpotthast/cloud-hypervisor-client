@@ -6,3 +6,6 @@
 
 # Extracted OpenAPI Generator templates
 /templates_orig
+
+# OS-related
+.DS_Store
