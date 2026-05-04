@@ -6,41 +6,14 @@ use futures::future::*;
 use futures::Future;
 use http_body_util::BodyExt;
 use hyper;
-use hyper::header::{HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
+use hyper::header::{HeaderValue, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper_util::client::legacy::connect::Connect;
 use serde;
 use serde_json;
 
 use super::{configuration, Error};
 
-pub(crate) struct ApiKey {
-    pub in_header: bool,
-    pub in_query: bool,
-    pub param_name: String,
-}
-
-impl ApiKey {
-    fn key(&self, prefix: &Option<String>, key: &str) -> String {
-        match prefix {
-            None => key.to_owned(),
-            Some(ref prefix) => format!("{} {}", prefix, key),
-        }
-    }
-}
-
-#[allow(dead_code)]
-pub(crate) enum Auth {
-    None,
-    ApiKey(ApiKey),
-    Basic,
-    Oauth,
-}
-
-/// If the authorization type is unspecified then it will be automatically detected based
-/// on the configuration. This functionality is useful when the OpenAPI definition does not
-/// include an authorization scheme.
 pub(crate) struct Request {
-    auth: Option<Auth>,
     method: hyper::Method,
     path: String,
     query_params: HashMap<String, String>,
@@ -56,7 +29,6 @@ pub(crate) struct Request {
 impl Request {
     pub fn new(method: hyper::Method, path: String) -> Self {
         Request {
-            auth: None,
             method,
             path,
             query_params: HashMap::new(),
@@ -101,11 +73,6 @@ impl Request {
         self
     }
 
-    pub fn with_auth(mut self, auth: Auth) -> Self {
-        self.auth = Some(auth);
-        self
-    }
-
     pub fn execute<'a, C, U>(
         self,
         conf: &configuration::Configuration<C>,
@@ -140,50 +107,6 @@ impl Request {
         };
 
         let mut req_builder = hyper::Request::builder().uri(uri).method(self.method);
-
-        // Detect the authorization type if it hasn't been set.
-        let auth = self.auth.unwrap_or_else(||
-            if conf.api_key.is_some() {
-                panic!("Cannot automatically set the API key from the configuration, it must be specified in the OpenAPI definition")
-            } else if conf.oauth_access_token.is_some() {
-                Auth::Oauth
-            } else if conf.basic_auth.is_some() {
-                Auth::Basic
-            } else {
-                Auth::None
-            }
-        );
-        match auth {
-            Auth::ApiKey(apikey) => {
-                if let Some(ref key) = conf.api_key {
-                    let val = apikey.key(&key.prefix, &key.key);
-                    if apikey.in_query {
-                        query_string.append_pair(&apikey.param_name, &val);
-                    }
-                    if apikey.in_header {
-                        req_builder = req_builder.header(&apikey.param_name, val);
-                    }
-                }
-            }
-            Auth::Basic => {
-                if let Some(ref auth_conf) = conf.basic_auth {
-                    let mut text = auth_conf.0.clone();
-                    text.push(':');
-                    if let Some(ref pass) = auth_conf.1 {
-                        text.push_str(&pass[..]);
-                    }
-                    let encoded = base64::encode(&text);
-                    req_builder = req_builder.header(AUTHORIZATION, encoded);
-                }
-            }
-            Auth::Oauth => {
-                if let Some(ref token) = conf.oauth_access_token {
-                    let text = "Bearer ".to_owned() + token;
-                    req_builder = req_builder.header(AUTHORIZATION, text);
-                }
-            }
-            Auth::None => {}
-        }
 
         if let Some(ref user_agent) = conf.user_agent {
             req_builder = req_builder.header(

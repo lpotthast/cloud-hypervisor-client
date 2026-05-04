@@ -1,5 +1,6 @@
+use rootcause_tracing::RootcauseLayer;
 use tracing_subscriber::{
-    prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt, Layer,
+    Layer, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt,
 };
 
 pub fn init_subscriber() {
@@ -20,6 +21,7 @@ pub fn init_subscriber() {
     let fmt_layer_filtered = fmt_layer.with_filter(log_filter);
 
     tracing_subscriber::Registry::default()
+        .with(RootcauseLayer)
         .with(fmt_layer_filtered)
         .init();
 }

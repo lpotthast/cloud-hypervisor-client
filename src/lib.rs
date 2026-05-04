@@ -64,8 +64,42 @@ use std::sync::Arc;
 pub mod apis;
 pub mod models;
 
+/// A [`DefaultApiClient`] wired up to talk to the cloud-hypervisor VMM over a Unix domain socket.
+///
+/// Construct one with [`socket_based_api_client`].
 pub type SocketBasedApiClient = DefaultApiClient<hyperlocal::UnixConnector>;
 
+/// Builds a client for the cloud-hypervisor REST API exposed at the given Unix domain socket path.
+///
+/// This is the main entrypoint of the crate. Cloud-hypervisor exposes its API over a local Unix
+/// socket (typically configured via the VMM's `--api-socket` flag); pass that socket's path here
+/// and the returned [`SocketBasedApiClient`] can drive any endpoint of the [`DefaultApi`] trait.
+///
+/// The `vmm_socket_path` is not opened here. The connection is established lazily by `hyper` on the
+/// first request. A non-existent or unreachable socket therefore surfaces as an error from the
+/// first API call rather than from this function.
+///
+/// [`DefaultApi`]: apis::DefaultApi
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use cloud_hypervisor_client::apis::DefaultApi;
+/// use cloud_hypervisor_client::socket_based_api_client;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), String> {
+///     let client = socket_based_api_client("cloud_hypervisor_vm_socket.sock");
+///
+///     let vm_info = client.vm_info_get()
+///         .await
+///         .map_err(|err| format!("API call to vm_info_get failed: {:?}", err))?;
+///
+///     println!("Received vm info: {vm_info:?}");
+///
+///     Ok(())
+/// }
+/// ```
 pub fn socket_based_api_client(vmm_socket_path: impl AsRef<Path>) -> SocketBasedApiClient {
     use hyperlocal::UnixClientExt;
 
@@ -75,9 +109,6 @@ pub fn socket_based_api_client(vmm_socket_path: impl AsRef<Path>) -> SocketBased
         base_path: uri.to_string(),
         user_agent: None,
         client,
-        basic_auth: None,
-        oauth_access_token: None,
-        api_key: None,
     };
     DefaultApiClient::new(Arc::new(configuration))
 }

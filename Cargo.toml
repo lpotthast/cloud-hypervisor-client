@@ -1,6 +1,6 @@
 [package]
 name = "cloud-hypervisor-client"
-version = "0.3.3"
+version = "0.4.0+api-spec-0.3.0-2026-05-04"
 authors = ["Lukas Potthast <privat@lukas-potthast.de>"]
 edition = "2021"
 rust-version = "1.81.0"
@@ -12,9 +12,8 @@ keywords = ["cloud-hypervisor", "REST-API"]
 categories = ["api-bindings", "web-programming"]
 
 [dependencies]
-base64 = "~0.7.0"
 futures = "^0.3"
-http = "~0.2"
+http = "1"
 http-body-util = { version = "0.1.2" }
 hyper = { version = "^1.3.1", features = ["full"] }
 hyper-util = { version = "0.1.5", features = ["client", "client-legacy", "http1", "http2"] }

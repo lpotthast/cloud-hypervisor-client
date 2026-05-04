@@ -1,5 +1,6 @@
 /target
 
-!/workdir/downloads/.gitkeep
 /workdir/downloads/**
+!/workdir/downloads/.gitkeep
+!/workdir/downloads/cloud-hypervisor_*.yaml
 /workdir/output/**

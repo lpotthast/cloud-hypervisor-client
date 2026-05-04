@@ -1,7 +1,7 @@
-diff --git a/workdir/templates_original/hyper/api_mod.mustache b/workdir/templates/hyper/api_mod.mustache
+diff --git a/templates_original/hyper/api_mod.mustache b/templates/hyper/api_mod.mustache
 index 67baa44..a9b0971 100644
---- a/workdir/templates_original/hyper/api_mod.mustache
-+++ b/workdir/templates/hyper/api_mod.mustache
+--- a/templates_original/hyper/api_mod.mustache
++++ b/templates/hyper/api_mod.mustache
 @@ -6,33 +6,40 @@ use hyper::http;
  use hyper_util::client::legacy::connect::Connect;
  use serde_json;
@@ -48,11 +48,168 @@ index 67baa44..a9b0971 100644
          Error::Api(ApiError {
              code: e.0,
              body: e.1,
-diff --git a/workdir/templates_original/request.rs b/workdir/templates/request.rs
-index a6f7b74..e5733cc 100644
---- a/workdir/templates_original/request.rs
-+++ b/workdir/templates/request.rs
-@@ -225,7 +225,14 @@ impl Request {
+diff --git a/templates_original/hyper/configuration.mustache b/templates/hyper/configuration.mustache
+index 43a48ff..7726c6f 100644
+--- a/templates_original/hyper/configuration.mustache
++++ b/templates/hyper/configuration.mustache
+@@ -10,17 +10,6 @@ pub struct Configuration<C: Connect = HttpConnector>
+     pub base_path: String,
+     pub user_agent: Option<String>,
+     pub client: Client<C, String>,
+-    pub basic_auth: Option<BasicAuth>,
+-    pub oauth_access_token: Option<String>,
+-    pub api_key: Option<ApiKey>,
+-    // TODO: take an oauth2 token source, similar to the go one
+-}
+-
+-pub type BasicAuth = (String, Option<String>);
+-
+-pub struct ApiKey {
+-    pub prefix: Option<String>,
+-    pub key: String,
+ }
+ 
+ impl Configuration<HttpConnector> {
+@@ -34,10 +23,7 @@ impl Configuration<HttpConnector> {
+     ///
+     /// ```
+     /// # use {{externCrateName}}::apis::configuration::Configuration;
+-    /// let api_config = Configuration {
+-    ///   basic_auth: Some(("user".into(), None)),
+-    ///   ..Configuration::new()
+-    /// };
++    /// let api_config = Configuration::new();
+     /// ```
+     pub fn new() -> Configuration<HttpConnector> {
+         Configuration::default()
+@@ -68,9 +54,6 @@ impl<C: Connect> Configuration<C>
+             base_path: "{{{basePath}}}".to_owned(),
+             user_agent: {{#httpUserAgent}}Some("{{{.}}}".to_owned()){{/httpUserAgent}}{{^httpUserAgent}}Some("OpenAPI-Generator/{{{version}}}/rust".to_owned()){{/httpUserAgent}},
+             client,
+-            basic_auth: None,
+-            oauth_access_token: None,
+-            api_key: None,
+         }
+     }
+ }
+diff --git a/templates_original/request.rs b/templates/request.rs
+index a6f7b74..6bc94f0 100644
+--- a/templates_original/request.rs
++++ b/templates/request.rs
+@@ -7,40 +7,13 @@ use futures::future::*;
+ use http_body_util::BodyExt;
+ use hyper;
+ use hyper_util::client::legacy::connect::Connect;
+-use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderValue, USER_AGENT};
++use hyper::header::{CONTENT_LENGTH, CONTENT_TYPE, HeaderValue, USER_AGENT};
+ use serde;
+ use serde_json;
+ 
+ use super::{configuration, Error};
+ 
+-pub(crate) struct ApiKey {
+-    pub in_header: bool,
+-    pub in_query: bool,
+-    pub param_name: String,
+-}
+-
+-impl ApiKey {
+-    fn key(&self, prefix: &Option<String>, key: &str) -> String {
+-        match prefix {
+-            None => key.to_owned(),
+-            Some(ref prefix) => format!("{} {}", prefix, key),
+-        }
+-    }
+-}
+-
+-#[allow(dead_code)]
+-pub(crate) enum Auth {
+-    None,
+-    ApiKey(ApiKey),
+-    Basic,
+-    Oauth,
+-}
+-
+-/// If the authorization type is unspecified then it will be automatically detected based
+-/// on the configuration. This functionality is useful when the OpenAPI definition does not
+-/// include an authorization scheme.
+ pub(crate) struct Request {
+-    auth: Option<Auth>,
+     method: hyper::Method,
+     path: String,
+     query_params: HashMap<String, String>,
+@@ -56,7 +29,6 @@ pub(crate) struct Request {
+ impl Request {
+     pub fn new(method: hyper::Method, path: String) -> Self {
+         Request {
+-            auth: None,
+             method,
+             path,
+             query_params: HashMap::new(),
+@@ -101,11 +73,6 @@ impl Request {
+         self
+     }
+ 
+-    pub fn with_auth(mut self, auth: Auth) -> Self {
+-        self.auth = Some(auth);
+-        self
+-    }
+-
+     pub fn execute<'a, C, U>(
+         self,
+         conf: &configuration::Configuration<C>,
+@@ -143,50 +110,6 @@ impl Request {
+             .uri(uri)
+             .method(self.method);
+ 
+-        // Detect the authorization type if it hasn't been set.
+-        let auth = self.auth.unwrap_or_else(||
+-            if conf.api_key.is_some() {
+-                panic!("Cannot automatically set the API key from the configuration, it must be specified in the OpenAPI definition")
+-            } else if conf.oauth_access_token.is_some() {
+-                Auth::Oauth
+-            } else if conf.basic_auth.is_some() {
+-                Auth::Basic
+-            } else {
+-                Auth::None
+-            }
+-        );
+-        match auth {
+-            Auth::ApiKey(apikey) => {
+-                if let Some(ref key) = conf.api_key {
+-                    let val = apikey.key(&key.prefix, &key.key);
+-                    if apikey.in_query {
+-                        query_string.append_pair(&apikey.param_name, &val);
+-                    }
+-                    if apikey.in_header {
+-                        req_builder = req_builder.header(&apikey.param_name, val);
+-                    }
+-                }
+-            }
+-            Auth::Basic => {
+-                if let Some(ref auth_conf) = conf.basic_auth {
+-                    let mut text = auth_conf.0.clone();
+-                    text.push(':');
+-                    if let Some(ref pass) = auth_conf.1 {
+-                        text.push_str(&pass[..]);
+-                    }
+-                    let encoded = base64::encode(&text);
+-                    req_builder = req_builder.header(AUTHORIZATION, encoded);
+-                }
+-            }
+-            Auth::Oauth => {
+-                if let Some(ref token) = conf.oauth_access_token {
+-                    let text = "Bearer ".to_owned() + token;
+-                    req_builder = req_builder.header(AUTHORIZATION, text);
+-                }
+-            }
+-            Auth::None => {}
+-        }
+-
+         if let Some(ref user_agent) = conf.user_agent {
+             req_builder = req_builder.header(USER_AGENT, match HeaderValue::from_str(user_agent) {
+                 Ok(header_value) => header_value,
+@@ -225,7 +148,14 @@ impl Request {
              .and_then(move |response| {
                  let status = response.status();
                  if !status.is_success() {
