@@ -28,6 +28,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: generator
+          cache-on-failure: true
+
+      - name: Cache OpenAPI Generator jar
+        uses: actions/cache@v4
+        with:
+          path: generator/workdir/downloads
+          key: openapi-generator-jar-${{ hashFiles('generator/src/generator_jar.rs') }}
 
       - name: Run generator
         run: cargo run --locked --manifest-path generator/Cargo.toml 2>&1 | tee "${RUNNER_TEMP}/generator.log"
