@@ -1,5 +1,11 @@
 # cloud-hypervisor-client
 
+[![Crates.io](https://img.shields.io/crates/v/cloud-hypervisor-client.svg)](https://crates.io/crates/cloud-hypervisor-client)
+[![Docs.rs](https://docs.rs/cloud-hypervisor-client/badge.svg)](https://docs.rs/cloud-hypervisor-client)
+[![CI](https://github.com/lpotthast/cloud-hypervisor-client/actions/workflows/ci.yml/badge.svg)](https://github.com/lpotthast/cloud-hypervisor-client/actions/workflows/ci.yml)
+[![MSRV](https://img.shields.io/badge/MSRV-1.81.0-blue.svg)](https://github.com/lpotthast/cloud-hypervisor-client/blob/main/Cargo.toml)
+[![License](https://img.shields.io/crates/l/cloud-hypervisor-client.svg)](https://github.com/lpotthast/cloud-hypervisor-client#license)
+
 Unofficial Rust crate for interacting with
 the [cloud-hypervisor REST API](https://github.com/cloud-hypervisor/cloud-hypervisor/blob/main/docs/api.md)
 
