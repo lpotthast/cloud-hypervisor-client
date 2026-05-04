@@ -12,30 +12,27 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct VdpaConfig {
-    #[serde(rename = "path")]
-    pub path: String,
-    #[serde(rename = "num_queues")]
-    pub num_queues: i32,
-    #[serde(rename = "iommu", skip_serializing_if = "Option::is_none")]
-    pub iommu: Option<bool>,
+pub struct GenericVhostUserConfig {
+    #[serde(rename = "socket")]
+    pub socket: String,
+    #[serde(rename = "queue_size", skip_serializing_if = "Option::is_none")]
+    pub queue_size: Option<Vec<u16>>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
     pub pci_segment: Option<i32>,
     #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
     pub pci_device_id: Option<i32>,
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    #[serde(rename = "virtio_id")]
+    pub virtio_id: u32,
 }
 
-impl VdpaConfig {
-    pub fn new(path: String, num_queues: i32) -> VdpaConfig {
-        VdpaConfig {
-            path,
-            num_queues,
-            iommu: None,
+impl GenericVhostUserConfig {
+    pub fn new(socket: String, virtio_id: u32) -> GenericVhostUserConfig {
+        GenericVhostUserConfig {
+            socket,
+            queue_size: None,
             pci_segment: None,
             pci_device_id: None,
-            id: None,
+            virtio_id,
         }
     }
 }

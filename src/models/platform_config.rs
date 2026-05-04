@@ -32,6 +32,10 @@ pub struct PlatformConfig {
     pub tdx: Option<bool>,
     #[serde(rename = "sev_snp", skip_serializing_if = "Option::is_none")]
     pub sev_snp: Option<bool>,
+    #[serde(rename = "iommufd", skip_serializing_if = "Option::is_none")]
+    pub iommufd: Option<bool>,
+    #[serde(rename = "vfio_p2p_dma", skip_serializing_if = "Option::is_none")]
+    pub vfio_p2p_dma: Option<bool>,
 }
 
 impl PlatformConfig {
@@ -45,6 +49,8 @@ impl PlatformConfig {
             oem_strings: None,
             tdx: None,
             sev_snp: None,
+            iommufd: None,
+            vfio_p2p_dma: None,
         }
     }
 }

@@ -23,6 +23,8 @@ pub struct FsConfig {
     pub queue_size: i32,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
     pub pci_segment: Option<i32>,
+    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
+    pub pci_device_id: Option<i32>,
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
 }
@@ -35,6 +37,7 @@ impl FsConfig {
             num_queues,
             queue_size,
             pci_segment: None,
+            pci_device_id: None,
             id: None,
         }
     }

@@ -15,10 +15,18 @@ use serde::{Deserialize, Serialize};
 pub struct VmAddUserDevice {
     #[serde(rename = "socket")]
     pub socket: String,
+    #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
+    pub pci_segment: Option<i32>,
+    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
+    pub pci_device_id: Option<i32>,
 }
 
 impl VmAddUserDevice {
     pub fn new(socket: String) -> VmAddUserDevice {
-        VmAddUserDevice { socket }
+        VmAddUserDevice {
+            socket,
+            pci_segment: None,
+            pci_device_id: None,
+        }
     }
 }

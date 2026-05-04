@@ -18,40 +18,18 @@ pub struct ConsoleConfig {
     #[serde(rename = "socket", skip_serializing_if = "Option::is_none")]
     pub socket: Option<String>,
     #[serde(rename = "mode")]
-    pub mode: Mode,
+    pub mode: models::ConsoleMode,
     #[serde(rename = "iommu", skip_serializing_if = "Option::is_none")]
     pub iommu: Option<bool>,
 }
 
 impl ConsoleConfig {
-    pub fn new(mode: Mode) -> ConsoleConfig {
+    pub fn new(mode: models::ConsoleMode) -> ConsoleConfig {
         ConsoleConfig {
             file: None,
             socket: None,
             mode,
             iommu: None,
         }
-    }
-}
-///
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub enum Mode {
-    #[serde(rename = "Off")]
-    Off,
-    #[serde(rename = "Pty")]
-    Pty,
-    #[serde(rename = "Tty")]
-    Tty,
-    #[serde(rename = "File")]
-    File,
-    #[serde(rename = "Socket")]
-    Socket,
-    #[serde(rename = "Null")]
-    Null,
-}
-
-impl Default for Mode {
-    fn default() -> Mode {
-        Self::Off
     }
 }

@@ -17,7 +17,7 @@ pub struct VmInfo {
     #[serde(rename = "config")]
     pub config: models::VmConfig,
     #[serde(rename = "state")]
-    pub state: State,
+    pub state: models::VmState,
     #[serde(rename = "memory_actual_size", skip_serializing_if = "Option::is_none")]
     pub memory_actual_size: Option<i64>,
     #[serde(rename = "device_tree", skip_serializing_if = "Option::is_none")]
@@ -26,30 +26,12 @@ pub struct VmInfo {
 
 impl VmInfo {
     /// Virtual Machine information
-    pub fn new(config: models::VmConfig, state: State) -> VmInfo {
+    pub fn new(config: models::VmConfig, state: models::VmState) -> VmInfo {
         VmInfo {
             config,
             state,
             memory_actual_size: None,
             device_tree: None,
         }
-    }
-}
-///
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub enum State {
-    #[serde(rename = "Created")]
-    Created,
-    #[serde(rename = "Running")]
-    Running,
-    #[serde(rename = "Shutdown")]
-    Shutdown,
-    #[serde(rename = "Paused")]
-    Paused,
-}
-
-impl Default for State {
-    fn default() -> State {
-        Self::Created
     }
 }

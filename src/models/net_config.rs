@@ -43,11 +43,19 @@ pub struct NetConfig {
     pub id: Option<String>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
     pub pci_segment: Option<i32>,
+    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
+    pub pci_device_id: Option<i32>,
     #[serde(
         rename = "rate_limiter_config",
         skip_serializing_if = "Option::is_none"
     )]
     pub rate_limiter_config: Option<models::RateLimiterConfig>,
+    #[serde(rename = "offload_tso", skip_serializing_if = "Option::is_none")]
+    pub offload_tso: Option<bool>,
+    #[serde(rename = "offload_ufo", skip_serializing_if = "Option::is_none")]
+    pub offload_ufo: Option<bool>,
+    #[serde(rename = "offload_csum", skip_serializing_if = "Option::is_none")]
+    pub offload_csum: Option<bool>,
 }
 
 impl NetConfig {
@@ -67,7 +75,11 @@ impl NetConfig {
             vhost_mode: None,
             id: None,
             pci_segment: None,
+            pci_device_id: None,
             rate_limiter_config: None,
+            offload_tso: None,
+            offload_ufo: None,
+            offload_csum: None,
         }
     }
 }

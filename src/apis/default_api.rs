@@ -63,6 +63,10 @@ pub trait DefaultApi: Send + Sync {
         &self,
         fs_config: models::FsConfig,
     ) -> Pin<Box<dyn Future<Output = Result<models::PciDeviceInfo, Error>> + Send>>;
+    fn vm_add_generic_vhost_user_put(
+        &self,
+        generic_vhost_user_config: models::GenericVhostUserConfig,
+    ) -> Pin<Box<dyn Future<Output = Result<models::PciDeviceInfo, Error>> + Send>>;
     fn vm_add_net_put(
         &self,
         net_config: models::NetConfig,
@@ -107,6 +111,10 @@ pub trait DefaultApi: Send + Sync {
     fn vm_remove_device_put(
         &self,
         vm_remove_device: models::VmRemoveDevice,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
+    fn vm_resize_disk_put(
+        &self,
+        vm_resize_disk: models::VmResizeDisk,
     ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
     fn vm_resize_put(
         &self,
@@ -258,6 +266,20 @@ where
     }
 
     #[allow(unused_mut)]
+    fn vm_add_generic_vhost_user_put(
+        &self,
+        generic_vhost_user_config: models::GenericVhostUserConfig,
+    ) -> Pin<Box<dyn Future<Output = Result<models::PciDeviceInfo, Error>> + Send>> {
+        let mut req = __internal_request::Request::new(
+            hyper::Method::PUT,
+            "/vm.add-generic-vhost-user".to_string(),
+        );
+        req = req.with_body_param(generic_vhost_user_config);
+
+        req.execute(self.configuration.borrow())
+    }
+
+    #[allow(unused_mut)]
     fn vm_add_net_put(
         &self,
         net_config: models::NetConfig,
@@ -379,6 +401,19 @@ where
         let mut req =
             __internal_request::Request::new(hyper::Method::PUT, "/vm.remove-device".to_string());
         req = req.with_body_param(vm_remove_device);
+        req = req.returns_nothing();
+
+        req.execute(self.configuration.borrow())
+    }
+
+    #[allow(unused_mut)]
+    fn vm_resize_disk_put(
+        &self,
+        vm_resize_disk: models::VmResizeDisk,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>> {
+        let mut req =
+            __internal_request::Request::new(hyper::Method::PUT, "/vm.resize-disk".to_string());
+        req = req.with_body_param(vm_resize_disk);
         req = req.returns_nothing();
 
         req.execute(self.configuration.borrow())

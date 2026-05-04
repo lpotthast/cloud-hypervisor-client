@@ -17,6 +17,13 @@ pub struct RestoreConfig {
     pub source_url: String,
     #[serde(rename = "prefault", skip_serializing_if = "Option::is_none")]
     pub prefault: Option<bool>,
+    #[serde(
+        rename = "memory_restore_mode",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub memory_restore_mode: Option<models::MemoryRestoreMode>,
+    #[serde(rename = "resume", skip_serializing_if = "Option::is_none")]
+    pub resume: Option<bool>,
 }
 
 impl RestoreConfig {
@@ -24,6 +31,8 @@ impl RestoreConfig {
         RestoreConfig {
             source_url,
             prefault: None,
+            memory_restore_mode: None,
+            resume: None,
         }
     }
 }

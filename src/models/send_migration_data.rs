@@ -17,6 +17,17 @@ pub struct SendMigrationData {
     pub destination_url: String,
     #[serde(rename = "local", skip_serializing_if = "Option::is_none")]
     pub local: Option<bool>,
+    /// The maximum downtime the migration aims for, in milliseconds. Defaults to 300ms.
+    #[serde(rename = "downtime_ms", skip_serializing_if = "Option::is_none")]
+    pub downtime_ms: Option<i64>,
+    /// The timeout for the migration (maximum total duration), in seconds. Defaults to 3600s (one hour).
+    #[serde(rename = "timeout_s", skip_serializing_if = "Option::is_none")]
+    pub timeout_s: Option<i64>,
+    #[serde(rename = "timeout_strategy", skip_serializing_if = "Option::is_none")]
+    pub timeout_strategy: Option<models::TimeoutStrategy>,
+    /// The number of parallel TCP connections to use for migration. Must be between 1 and 128. Multiple connections are not supported with local UNIX-socket migration.
+    #[serde(rename = "connections", skip_serializing_if = "Option::is_none")]
+    pub connections: Option<i64>,
 }
 
 impl SendMigrationData {
@@ -24,6 +35,10 @@ impl SendMigrationData {
         SendMigrationData {
             destination_url,
             local: None,
+            downtime_ms: None,
+            timeout_s: None,
+            timeout_strategy: None,
+            connections: None,
         }
     }
 }

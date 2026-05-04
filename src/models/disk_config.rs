@@ -36,6 +36,8 @@ pub struct DiskConfig {
     pub rate_limiter_config: Option<models::RateLimiterConfig>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
     pub pci_segment: Option<i32>,
+    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
+    pub pci_device_id: Option<i32>,
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[serde(rename = "serial", skip_serializing_if = "Option::is_none")]
@@ -44,6 +46,14 @@ pub struct DiskConfig {
     pub rate_limit_group: Option<String>,
     #[serde(rename = "queue_affinity", skip_serializing_if = "Option::is_none")]
     pub queue_affinity: Option<Vec<models::VirtQueueAffinity>>,
+    #[serde(rename = "backing_files", skip_serializing_if = "Option::is_none")]
+    pub backing_files: Option<bool>,
+    #[serde(rename = "sparse", skip_serializing_if = "Option::is_none")]
+    pub sparse: Option<bool>,
+    #[serde(rename = "image_type", skip_serializing_if = "Option::is_none")]
+    pub image_type: Option<models::ImageType>,
+    #[serde(rename = "lock_granularity", skip_serializing_if = "Option::is_none")]
+    pub lock_granularity: Option<models::LockGranularity>,
 }
 
 impl DiskConfig {
@@ -59,10 +69,15 @@ impl DiskConfig {
             vhost_socket: None,
             rate_limiter_config: None,
             pci_segment: None,
+            pci_device_id: None,
             id: None,
             serial: None,
             rate_limit_group: None,
             queue_affinity: None,
+            backing_files: None,
+            sparse: None,
+            image_type: None,
+            lock_granularity: None,
         }
     }
 }

@@ -19,6 +19,8 @@ pub struct DeviceConfig {
     pub iommu: Option<bool>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
     pub pci_segment: Option<i32>,
+    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
+    pub pci_device_id: Option<i32>,
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[serde(
@@ -34,6 +36,7 @@ impl DeviceConfig {
             path,
             iommu: None,
             pci_segment: None,
+            pci_device_id: None,
             id: None,
             x_nv_gpudirect_clique: None,
         }

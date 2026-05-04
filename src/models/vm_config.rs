@@ -32,6 +32,8 @@ pub struct VmConfig {
     pub balloon: Option<models::BalloonConfig>,
     #[serde(rename = "fs", skip_serializing_if = "Option::is_none")]
     pub fs: Option<Vec<models::FsConfig>>,
+    #[serde(rename = "generic-vhost-user", skip_serializing_if = "Option::is_none")]
+    pub generic_vhost_user: Option<Vec<models::GenericVhostUserConfig>>,
     #[serde(rename = "pmem", skip_serializing_if = "Option::is_none")]
     pub pmem: Option<Vec<models::PmemConfig>>,
     #[serde(rename = "serial", skip_serializing_if = "Option::is_none")]
@@ -42,12 +44,12 @@ pub struct VmConfig {
     pub debug_console: Option<models::DebugConsoleConfig>,
     #[serde(rename = "devices", skip_serializing_if = "Option::is_none")]
     pub devices: Option<Vec<models::DeviceConfig>>,
+    #[serde(rename = "user_devices", skip_serializing_if = "Option::is_none")]
+    pub user_devices: Option<Vec<models::UserDeviceConfig>>,
     #[serde(rename = "vdpa", skip_serializing_if = "Option::is_none")]
     pub vdpa: Option<Vec<models::VdpaConfig>>,
     #[serde(rename = "vsock", skip_serializing_if = "Option::is_none")]
     pub vsock: Option<models::VsockConfig>,
-    #[serde(rename = "sgx_epc", skip_serializing_if = "Option::is_none")]
-    pub sgx_epc: Option<Vec<models::SgxEpcConfig>>,
     #[serde(rename = "numa", skip_serializing_if = "Option::is_none")]
     pub numa: Option<Vec<models::NumaConfig>>,
     #[serde(rename = "iommu", skip_serializing_if = "Option::is_none")]
@@ -81,14 +83,15 @@ impl VmConfig {
             rng: None,
             balloon: None,
             fs: None,
+            generic_vhost_user: None,
             pmem: None,
             serial: None,
             console: None,
             debug_console: None,
             devices: None,
+            user_devices: None,
             vdpa: None,
             vsock: None,
-            sgx_epc: None,
             numa: None,
             iommu: None,
             watchdog: None,
