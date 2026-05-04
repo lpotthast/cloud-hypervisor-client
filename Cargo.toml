@@ -11,6 +11,10 @@ repository = "https://github.com/lpotthast/cloud-hypervisor-client"
 keywords = ["cloud-hypervisor", "hypervisor", "virtualization", "vmm", "REST-API"]
 categories = ["api-bindings", "virtualization", "web-programming::http-client"]
 
+[package.metadata.api-spec]
+upstream-version = "0.3.0"
+regenerated-at = "2026-05-04"
+
 [dependencies]
 futures = "^0.3"
 http = "1"
