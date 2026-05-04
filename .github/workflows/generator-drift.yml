@@ -30,12 +30,12 @@ jobs:
           workspaces: generator
 
       - name: Run generator
-        run: cargo run --locked --manifest-path generator/Cargo.toml 2>&1 | tee generator.log
+        run: cargo run --locked --manifest-path generator/Cargo.toml 2>&1 | tee "${RUNNER_TEMP}/generator.log"
 
       - name: Check for outdated OpenAPI Generator jar
         id: outdated
         run: |
-          if grep -F "A newer OpenAPI Generator release is available" generator.log; then
+          if grep -F "A newer OpenAPI Generator release is available" "${RUNNER_TEMP}/generator.log"; then
             {
               echo "## Outdated OpenAPI Generator jar"
               echo
@@ -43,7 +43,7 @@ jobs:
               echo "Bump \`OPENAPI_GENERATOR_VERSION\` in \`generator/src/generator_jar.rs\`."
               echo
               echo '```'
-              grep -F "A newer OpenAPI Generator release is available" generator.log
+              grep -F "A newer OpenAPI Generator release is available" "${RUNNER_TEMP}/generator.log"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
             echo "OUTDATED=1" >> "$GITHUB_ENV"
