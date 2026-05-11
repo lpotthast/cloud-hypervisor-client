@@ -1,8 +1,9 @@
 use crate::dirs::Dirs;
+use crate::normalize;
 use assertr::prelude::*;
 use rootcause::option_ext::OptionExt;
 use rootcause::prelude::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tokio::fs::OpenOptions;
 use tokio::io::AsyncWriteExt;
 use yaml_rust2::YamlLoader;
@@ -20,6 +21,9 @@ pub async fn download(dirs: &Dirs) -> Result<PathBuf, Report> {
     let spec_path = dirs.downloads().join(format!(
         "cloud-hypervisor_{CLOUD_HYPERVISOR_OPENAPI_EXPECTED_VERSION}.yaml"
     ));
+    let normalized_path = dirs.downloads().join(format!(
+        "cloud-hypervisor_{CLOUD_HYPERVISOR_OPENAPI_EXPECTED_VERSION}.normalized.yaml"
+    ));
 
     tracing::info!(
         "Downloading version {CLOUD_HYPERVISOR_OPENAPI_EXPECTED_VERSION} of the OpenAPI spec for the cloud-hypervisor REST API..."
@@ -36,16 +40,29 @@ pub async fn download(dirs: &Dirs) -> Result<PathBuf, Report> {
         .context("Failed to parse version")?;
     assert_that!(parsed_version).is_equal_to(CLOUD_HYPERVISOR_OPENAPI_EXPECTED_VERSION);
 
+    write_file(&spec_path, &spec).await?;
+
+    tracing::info!("Lifting integer formats into schema types so `typeMappings:` resolves them...");
+    let normalized =
+        normalize::lift_integer_formats(&spec).context("Failed to normalize integer formats")?;
+    write_file(&normalized_path, &normalized).await?;
+
+    crate::postprocess::write_normalization_diff(dirs, &spec_path, &normalized_path).await?;
+
+    Ok(normalized_path)
+}
+
+async fn write_file(path: &Path, contents: &str) -> Result<(), Report> {
     OpenOptions::new()
         .create(true)
         .truncate(true)
         .write(true)
         .append(false)
-        .open(&spec_path)
+        .open(path)
         .await
-        .context_with(|| format!("Failed to open: {spec_path:?}"))?
-        .write_all(spec.as_bytes())
-        .await?;
-
-    Ok(spec_path)
+        .context_with(|| format!("Failed to open: {path:?}"))?
+        .write_all(contents.as_bytes())
+        .await
+        .context_with(|| format!("Failed to write: {path:?}"))?;
+    Ok(())
 }

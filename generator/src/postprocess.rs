@@ -1,5 +1,6 @@
 use crate::dirs::Dirs;
 use rootcause::prelude::*;
+use std::path::Path;
 use tokio::fs;
 use tokio::process::Command;
 
@@ -82,6 +83,57 @@ pub async fn write_templates_diff(dirs: &Dirs) -> Result<bool, Report> {
         }
         Some(1) => {
             tracing::info!("Differences found and saved to templates.diff");
+            Ok(true)
+        }
+        Some(code) => Err(report!("`git diff` failed with exit code {}", code)),
+        None => Err(report!("`git diff` terminated by signal")),
+    }
+}
+
+pub async fn write_normalization_diff(
+    dirs: &Dirs,
+    raw: &Path,
+    normalized: &Path,
+) -> Result<bool, Report> {
+    tracing::info!("Calculating normalization diff...");
+    // Sibling of the two YAML files, with the `.yaml` suffix swapped for `.diff`. So:
+    // `cloud-hypervisor_<ver>.normalized.yaml` -> `cloud-hypervisor_<ver>.normalized.diff`.
+    let diff_path = normalized.with_extension("diff");
+    let output = Command::new("git")
+        .arg("-c")
+        .arg("core.autocrlf=false")
+        .arg("-c")
+        .arg("core.safecrlf=false")
+        .arg("diff")
+        .arg("-w")
+        .arg("--no-index")
+        .arg("--output")
+        .arg(&diff_path)
+        .arg(
+            raw.strip_prefix(dirs.workdir())
+                .expect("raw spec is a child of workdir"),
+        )
+        .arg(
+            normalized
+                .strip_prefix(dirs.workdir())
+                .expect("normalized spec is a child of workdir"),
+        )
+        .current_dir(dirs.workdir())
+        .output()
+        .await
+        .context("Failed to run `git diff` on specs")?;
+
+    let diff_display = diff_path
+        .strip_prefix(dirs.workdir())
+        .unwrap_or(&diff_path)
+        .display();
+    match output.status.code() {
+        Some(0) => {
+            tracing::info!("No differences found between raw and normalized spec.");
+            Ok(false)
+        }
+        Some(1) => {
+            tracing::info!("Differences found and saved to {diff_display}");
             Ok(true)
         }
         Some(code) => Err(report!("`git diff` failed with exit code {}", code)),

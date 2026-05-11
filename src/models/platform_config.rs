@@ -14,14 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PlatformConfig {
     #[serde(rename = "num_pci_segments", skip_serializing_if = "Option::is_none")]
-    pub num_pci_segments: Option<i32>,
+    pub num_pci_segments: Option<i16>,
     #[serde(rename = "iommu_segments", skip_serializing_if = "Option::is_none")]
-    pub iommu_segments: Option<Vec<i32>>,
+    pub iommu_segments: Option<Vec<i16>>,
     #[serde(
         rename = "iommu_address_width",
         skip_serializing_if = "Option::is_none"
     )]
-    pub iommu_address_width: Option<i32>,
+    pub iommu_address_width: Option<u8>,
     #[serde(rename = "serial_number", skip_serializing_if = "Option::is_none")]
     pub serial_number: Option<String>,
     #[serde(rename = "uuid", skip_serializing_if = "Option::is_none")]

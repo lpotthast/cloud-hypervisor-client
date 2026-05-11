@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0+api-spec-0.3.0-2026-05-11] - 2026-05-11
+
+> Published to crates.io as `0.5.0+api-spec-0.3.0-2026-05-11`.
+
+### cloud-hypervisor-client
+
+#### Added
+
+- **Breaking.** New optional fields on `models::RngConfig`:
+    - `id: Option<String>`
+    - `pci_segment: Option<i16>`
+    - `pci_device_id: Option<u8>`
+- **Breaking.** New optional field on `models::DeviceConfig`: `x_exclude_mmap_bars: Option<Vec<i64>>`.
+
+#### Changed
+
+- **Breaking.** Integer fields whose upstream `format` is one of `uint8` / `uint16` / `int8` /
+  `int16` now render as the matching Rust integer type instead of the `i32` fallback OpenAPI
+  Generator previously produced. Driven by the new generator-side normalization pass (see below).
+  The complete set of affected fields:
+    - `pci_segment` on every `*Config` model that carries one: `i32` -> `i16`, or `Option`-wrapped where required.
+    - `pci_device_id` on every `*Config` model that carries one: `i32` -> `u8`, or `Option`-wrapped where required.
+    - `DeviceConfig::x_nv_gpudirect_clique`: `Option<i32>` -> `Option<i8>`.
+    - `PlatformConfig::num_pci_segments`: `Option<i32>` -> `Option<i16>`.
+    - `PlatformConfig::iommu_segments`: `Option<Vec<i32>>` -> `Option<Vec<i16>>`.
+    - `PlatformConfig::iommu_address_width`: `Option<i32>` -> `Option<u8>`.
+- **Breaking.** Field declaration order inside `RngConfig` changed. `src` moves from first to last.
+
+### generator
+
+#### Added
+
+- `generator/src/normalize.rs`: post-fetch pass that rewrites every `{ type: integer, format: <int-format> }` schema in
+  the downloaded spec to `{ type: <int-format> }`. `openapi-generator.yaml`'s `typeMappings:` block then resolves every
+  integer format to its Rust counterpart, replacing OpenAPI Generator's silent `i32` widening for every format besides
+  `int32` / `int64`.
+- `generator/workdir/downloads/cloud-hypervisor_<version>.normalized.yaml`: the post-rewrite spec fed to OpenAPI
+  Generator.
+- `generator/workdir/downloads/cloud-hypervisor_<version>.normalized.diff`: unified diff between the original and
+  normalized YAML files. Generated and committed for review.
+
+#### Changed
+
+- `openapi-generator.yaml` `typeMappings:` gained `int8` / `int16` / `int32` / `int64` entries to match the existing
+  `uint8` / `uint16` / `uint32` / `uint64` ones.
+
 ## [0.4.0+api-spec-0.3.0-2026-05-04] - 2026-05-04
 
 ### cloud-hypervisor-client
@@ -151,7 +197,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   / `src/models`. Generator config sets `library: hyper`, `avoidBoxedModels: true`, `bestFitInt: true`, and
   `useSingleRequestParameter: true`.
 
-[Unreleased]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.4.0+api-spec-0.3.0-2026-05-04...HEAD
+[Unreleased]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.5.0+api-spec-0.3.0-2026-05-11...HEAD
+
+[0.5.0+api-spec-0.3.0-2026-05-11]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.4.0+api-spec-0.3.0-2026-05-04...v0.5.0+api-spec-0.3.0-2026-05-11
 
 [0.4.0+api-spec-0.3.0-2026-05-04]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.3.3...v0.4.0+api-spec-0.3.0-2026-05-04
 

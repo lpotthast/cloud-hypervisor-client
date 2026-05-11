@@ -1,6 +1,7 @@
 mod dirs;
 mod generate;
 mod generator_jar;
+mod normalize;
 mod postprocess;
 mod spec;
 mod tracing_init;

@@ -18,16 +18,21 @@ pub struct DeviceConfig {
     #[serde(rename = "iommu", skip_serializing_if = "Option::is_none")]
     pub iommu: Option<bool>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
-    pub pci_segment: Option<i32>,
+    pub pci_segment: Option<i16>,
     #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
-    pub pci_device_id: Option<i32>,
+    pub pci_device_id: Option<u8>,
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[serde(
         rename = "x_nv_gpudirect_clique",
         skip_serializing_if = "Option::is_none"
     )]
-    pub x_nv_gpudirect_clique: Option<i32>,
+    pub x_nv_gpudirect_clique: Option<i8>,
+    #[serde(
+        rename = "x_exclude_mmap_bars",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub x_exclude_mmap_bars: Option<Vec<i64>>,
 }
 
 impl DeviceConfig {
@@ -39,6 +44,7 @@ impl DeviceConfig {
             pci_device_id: None,
             id: None,
             x_nv_gpudirect_clique: None,
+            x_exclude_mmap_bars: None,
         }
     }
 }

@@ -18,9 +18,9 @@ pub struct UserDeviceConfig {
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
-    pub pci_segment: Option<i32>,
+    pub pci_segment: Option<i16>,
     #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
-    pub pci_device_id: Option<i32>,
+    pub pci_device_id: Option<u8>,
 }
 
 impl UserDeviceConfig {

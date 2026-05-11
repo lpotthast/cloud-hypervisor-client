@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PciSegmentConfig {
     #[serde(rename = "pci_segment")]
-    pub pci_segment: i32,
+    pub pci_segment: i16,
     #[serde(
         rename = "mmio32_aperture_weight",
         skip_serializing_if = "Option::is_none"
@@ -28,7 +28,7 @@ pub struct PciSegmentConfig {
 }
 
 impl PciSegmentConfig {
-    pub fn new(pci_segment: i32) -> PciSegmentConfig {
+    pub fn new(pci_segment: i16) -> PciSegmentConfig {
         PciSegmentConfig {
             pci_segment,
             mmio32_aperture_weight: None,

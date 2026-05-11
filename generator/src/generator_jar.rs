@@ -144,21 +144,23 @@ async fn fetch_latest_release() -> Result<Version, Report> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use indoc::indoc;
 
-    const SAMPLE_METADATA: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
-<metadata>
-  <groupId>org.openapitools</groupId>
-  <artifactId>openapi-generator-cli</artifactId>
-  <versioning>
-    <latest>7.22.0</latest>
-    <release>7.22.0</release>
-    <versions>
-      <version>7.12.0</version>
-      <version>7.22.0</version>
-    </versions>
-    <lastUpdated>20260428095039</lastUpdated>
-  </versioning>
-</metadata>"#;
+    const SAMPLE_METADATA: &str = indoc! {r#"<?xml version="1.0" encoding="UTF-8"?>
+        <metadata>
+          <groupId>org.openapitools</groupId>
+          <artifactId>openapi-generator-cli</artifactId>
+          <versioning>
+            <latest>7.22.0</latest>
+            <release>7.22.0</release>
+            <versions>
+              <version>7.12.0</version>
+              <version>7.22.0</version>
+            </versions>
+            <lastUpdated>20260428095039</lastUpdated>
+          </versioning>
+        </metadata>"#
+    };
 
     #[test]
     fn deserializes_maven_metadata_and_prefers_release() {

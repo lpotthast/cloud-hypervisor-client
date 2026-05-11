@@ -3,4 +3,5 @@
 /workdir/downloads/**
 !/workdir/downloads/.gitkeep
 !/workdir/downloads/cloud-hypervisor_*.yaml
+!/workdir/downloads/cloud-hypervisor_*.diff
 /workdir/output/**

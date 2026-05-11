@@ -6,9 +6,10 @@ publish = false
 
 [dependencies]
 assertr = "0.6.0"
+indoc = "2.0.7"
 futures-util = "0.3.32"
 hex = "0.4.3"
-quick-xml = { version = "0.39.2", features = ["serialize"] }
+quick-xml = { version = "0.39.4", features = ["serialize"] }
 reqwest = { version = "0.13.3", default-features = false, features = ["rustls", "stream"] }
 rootcause = "0.12.1"
 rootcause-backtrace = "0.12.1"
@@ -16,7 +17,7 @@ rootcause-tracing = "0.12.1"
 semver = { version = "1.0.28", features = ["serde"] }
 serde = { version = "1.0.228", features = ["derive"] }
 sha1 = "0.11.0"
-tokio = { version = "1.52.1", features = ["full"] }
+tokio = { version = "1.52.3", features = ["full"] }
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 yaml-rust2 = "0.11.0"

@@ -30,7 +30,7 @@ Or add it to your `Cargo.toml` manually:
 
 ```toml
 [dependencies]
-cloud-hypervisor-client = "0.4"
+cloud-hypervisor-client = "0.5.0+api-spec-0.3.0-2026-05-11"
 ```
 
 The crate targets a local cloud-hypervisor VMM over a Unix domain socket via `hyper` and `hyperlocal`, so it
