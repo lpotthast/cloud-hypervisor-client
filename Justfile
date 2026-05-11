@@ -12,6 +12,17 @@ install-tools:
 gen:
   cd ./generator && cargo run
 
+# Run everything that CI runs, locally (skipping the MSRV check).
+verify:
+  cargo fmt --all -- --check
+  cargo check --all-targets --locked
+  cargo test --all-targets --locked
+  cargo build --release --all-targets --locked
+  cargo doc --release --locked --no-deps
+  cargo check --manifest-path generator/Cargo.toml --all-targets --locked
+  cargo clippy --manifest-path generator/Cargo.toml --all-targets --locked -- -D warnings
+  cargo test --manifest-path generator/Cargo.toml --all-targets --locked
+
 # Find the minimum supported rust version.
 msrv:
     cargo msrv find
