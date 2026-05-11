@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0+api-spec-0.3.0-2026-05-11] - 2026-05-11
 
-> Published to crates.io as `0.5.0+api-spec-0.3.0-2026-05-11`.
-
 ### cloud-hypervisor-client
 
 #### Added
