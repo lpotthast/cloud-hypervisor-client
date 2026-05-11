@@ -1,11 +1,11 @@
 use assertr::prelude::*;
 use rootcause::prelude::*;
-use std::cell::LazyCell;
+use std::sync::LazyLock;
 use yaml_rust2::yaml::Hash;
 use yaml_rust2::{Yaml, YamlEmitter, YamlLoader};
 
-const TYPE: LazyCell<Yaml> = LazyCell::new(|| Yaml::String("type".to_string()));
-const FORMAT: LazyCell<Yaml> = LazyCell::new(|| Yaml::String("format".to_string()));
+static TYPE: LazyLock<Yaml> = LazyLock::new(|| Yaml::String("type".to_string()));
+static FORMAT: LazyLock<Yaml> = LazyLock::new(|| Yaml::String("format".to_string()));
 
 /// Integer formats lifted into the schema's `type:` key by the normalization pass.
 const INT_FORMATS: &[&str] = &[
