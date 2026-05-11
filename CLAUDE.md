@@ -33,6 +33,7 @@ Library (run from repo root):
 
 - `cargo build` / `cargo build --release`
 - `cargo test`
+- `cargo test --test <name>` / `cargo test <substring>` for a single test or filtered subset.
 - `cargo fmt` / `cargo fmt --check`
 - `cargo clippy --all-targets`
 - `cargo run --example get_info` (the example expects a real VMM socket at `cloud_hypervisor_vm_socket.sock`
@@ -47,6 +48,19 @@ Code generator:
   with no arguments to list recipes.
 - `cargo run --manifest-path generator/Cargo.toml` works equivalently from any working directory.
   `Dirs::init` anchors `workdir` to the generator crate's `CARGO_MANIFEST_DIR`, so CWD is not significant.
+
+Maintenance:
+
+- `just ci` runs everything the GitHub Actions `ci.yml` workflow runs (fmt check, cargo check / test /
+  build / doc on the library, plus check / clippy / test on the `generator/` crate), with
+  `RUSTFLAGS=-D warnings` and `--locked` to match CI behaviour. The MSRV job is intentionally skipped;
+  use `just msrv` separately when touching dependency versions.
+- `just install-tools` installs `cargo-minimal-versions` and `cargo-msrv` (one-time, via stable toolchain).
+- `just msrv` runs `cargo msrv find` to (re)derive the minimum supported Rust version. The result must
+  match the `rust-version` field in `Cargo.toml` (currently `1.86.0`) and the MSRV badge in `README.md`.
+- `just minimal-versions` runs `cargo minimal-versions check --workspace --direct` to verify that the
+  declared dependency lower bounds in `Cargo.toml` actually compile. Run this after touching versions in
+  `[dependencies]`.
 
 ## Code generation pipeline
 
@@ -91,4 +105,14 @@ The generator is `generator/src/main.rs`. The flow:
 - After any generator change, run `just gen` and inspect the resulting diff under `src/` before committing.
   Commit the regenerated `src/` together with the template/config change in the same commit (see commit
   b1c3cb0 for the established pattern).
+
+## Versioning and release metadata
+
+The crate version in `Cargo.toml` carries upstream-spec provenance in its build metadata:
+`<semver>+api-spec-<upstream-version>-<regenerated-at-date>` (currently
+`0.5.0+api-spec-0.3.0-2026-05-11`). The same two values are mirrored as machine-readable fields under
+`[package.metadata.api-spec]` (`upstream-version`, `regenerated-at`). Keep all three in sync, and update
+the MSRV badge / version snippet in `README.md` plus the entry in `CHANGELOG.md` whenever the version
+changes. Cargo treats the `+...` build metadata as opaque, so it does not affect semver resolution; do
+not "simplify" it away.
 
