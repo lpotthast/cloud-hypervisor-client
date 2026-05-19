@@ -40,7 +40,7 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "cloud-hypervisor-client"
-version = "0.5.0+api-spec-0.3.0-2026-05-11"
+version = "0.6.0+api-spec-0.3.0-2026-05-19"
 dependencies = [
  "futures",
  "http",

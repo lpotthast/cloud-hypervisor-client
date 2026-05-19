@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0+api-spec-0.3.0-2026-05-19] - 2026-05-19
+
+### cloud-hypervisor-client
+
+#### Added
+
+- **Breaking.** New optional fields on `models::ConsoleConfig`:
+    - `id: Option<String>`
+    - `pci_segment: Option<i16>`
+    - `pci_device_id: Option<u8>`
+- New `models::SerialConfig` (fields `file: Option<String>`, `socket: Option<String>`, `mode: models::ConsoleMode`).
+
+#### Changed
+
+- **Breaking.** `VmConfig::serial` is now `Option<models::SerialConfig>` instead of `Option<models::ConsoleConfig>`.
+- **Breaking.** `PlatformConfig::iommu_address_width` renamed to `iommu_address_width_bits`.
+
 ## [0.5.0+api-spec-0.3.0-2026-05-11] - 2026-05-11
 
 ### cloud-hypervisor-client
@@ -195,7 +212,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   / `src/models`. Generator config sets `library: hyper`, `avoidBoxedModels: true`, `bestFitInt: true`, and
   `useSingleRequestParameter: true`.
 
-[Unreleased]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.5.0+api-spec-0.3.0-2026-05-11...HEAD
+[Unreleased]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.6.0+api-spec-0.3.0-2026-05-19...HEAD
+
+[0.6.0+api-spec-0.3.0-2026-05-19]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.5.0+api-spec-0.3.0-2026-05-11...v0.6.0+api-spec-0.3.0-2026-05-19
 
 [0.5.0+api-spec-0.3.0-2026-05-11]: https://github.com/lpotthast/cloud-hypervisor-client/compare/v0.4.0+api-spec-0.3.0-2026-05-04...v0.5.0+api-spec-0.3.0-2026-05-11
 
