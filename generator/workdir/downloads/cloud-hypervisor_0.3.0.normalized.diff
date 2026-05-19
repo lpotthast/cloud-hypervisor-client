@@ -1,5 +1,5 @@
 diff --git a/downloads/cloud-hypervisor_0.3.0.yaml b/downloads/cloud-hypervisor_0.3.0.normalized.yaml
-index 2637e15..d57ce89 100644
+index 5ed7e9d..3a000df 100644
 --- a/downloads/cloud-hypervisor_0.3.0.yaml
 +++ b/downloads/cloud-hypervisor_0.3.0.normalized.yaml
 @@ -1,15 +1,14 @@
@@ -458,7 +458,7 @@ index 2637e15..d57ce89 100644
 -            type: integer
 -            format: int16
 +            type: int16
-         iommu_address_width:
+         iommu_address_width_bits:
 -          type: integer
 -          format: uint8
 +          type: uint8
@@ -804,15 +804,30 @@ index 2637e15..d57ce89 100644
      ConsoleConfig:
        required:
          - mode
-@@ -1197,7 +1106,6 @@ components:
-         iommu:
-           type: boolean
-           default: false
+@@ -1200,12 +1109,9 @@ components:
+         id:
+           type: string
+         pci_segment:
+-          type: integer
+-          format: int16
++          type: int16
+         pci_device_id:
+-          type: integer
+-          format: uint8
+-
++          type: uint8
+     SerialConfig:
+       required:
+         - mode
+@@ -1217,7 +1123,6 @@ components:
+           type: string
+         mode:
+           $ref: "#/components/schemas/ConsoleMode"
 -
      DebugConsoleConfig:
        required:
          - mode
-@@ -1209,7 +1117,6 @@ components:
+@@ -1229,7 +1134,6 @@ components:
            $ref: "#/components/schemas/ConsoleMode"
          iobase:
            type: integer
@@ -820,7 +835,7 @@ index 2637e15..d57ce89 100644
      DeviceConfig:
        required:
          - path
-@@ -1221,22 +1128,17 @@ components:
+@@ -1241,22 +1145,17 @@ components:
            type: boolean
            default: false
          pci_segment:
@@ -847,7 +862,7 @@ index 2637e15..d57ce89 100644
      UserDeviceConfig:
        required:
          - socket
-@@ -1247,12 +1149,9 @@ components:
+@@ -1267,12 +1166,9 @@ components:
          id:
            type: string
          pci_segment:
@@ -862,7 +877,7 @@ index 2637e15..d57ce89 100644
      TpmConfig:
        required:
          - socket
-@@ -1260,7 +1159,6 @@ components:
+@@ -1280,7 +1176,6 @@ components:
        properties:
          socket:
            type: string
@@ -870,7 +885,7 @@ index 2637e15..d57ce89 100644
      VdpaConfig:
        required:
          - path
-@@ -1276,14 +1174,11 @@ components:
+@@ -1296,14 +1191,11 @@ components:
            type: boolean
            default: false
          pci_segment:
@@ -887,7 +902,7 @@ index 2637e15..d57ce89 100644
      VsockConfig:
        required:
          - cid
-@@ -1291,25 +1186,21 @@ components:
+@@ -1311,25 +1203,21 @@ components:
        type: object
        properties:
          cid:
@@ -917,7 +932,7 @@ index 2637e15..d57ce89 100644
      NumaDistance:
        required:
          - destination
-@@ -1317,25 +1208,20 @@ components:
+@@ -1337,25 +1225,20 @@ components:
        type: object
        properties:
          destination:
@@ -947,7 +962,7 @@ index 2637e15..d57ce89 100644
          distances:
            type: array
            items:
-@@ -1347,11 +1233,9 @@ components:
+@@ -1367,11 +1250,9 @@ components:
          pci_segments:
            type: array
            items:
@@ -960,7 +975,7 @@ index 2637e15..d57ce89 100644
      VmResize:
        type: object
        properties:
-@@ -1360,13 +1244,10 @@ components:
+@@ -1380,13 +1261,10 @@ components:
            type: integer
          desired_ram:
            description: desired memory ram in bytes
@@ -976,7 +991,7 @@ index 2637e15..d57ce89 100644
      VmResizeDisk:
        type: object
        properties:
-@@ -1375,9 +1256,7 @@ components:
+@@ -1395,9 +1273,7 @@ components:
            type: string
          desired_size:
            description: desired disk size in bytes
@@ -987,7 +1002,7 @@ index 2637e15..d57ce89 100644
      VmResizeZone:
        type: object
        properties:
-@@ -1385,32 +1264,28 @@ components:
+@@ -1405,32 +1281,28 @@ components:
            type: string
          desired_ram:
            description: desired memory zone size in bytes
@@ -1024,7 +1039,7 @@ index 2637e15..d57ce89 100644
      RestoreConfig:
        required:
          - source_url
-@@ -1424,7 +1299,6 @@ components:
+@@ -1444,7 +1316,6 @@ components:
            $ref: "#/components/schemas/MemoryRestoreMode"
          resume:
            type: boolean
@@ -1032,7 +1047,7 @@ index 2637e15..d57ce89 100644
      ReceiveMigrationData:
        required:
          - receiver_url
-@@ -1432,16 +1306,13 @@ components:
+@@ -1452,16 +1323,13 @@ components:
        properties:
          receiver_url:
            type: string
@@ -1054,7 +1069,7 @@ index 2637e15..d57ce89 100644
      SendMigrationData:
        required:
          - destination_url
-@@ -1452,34 +1323,23 @@ components:
+@@ -1472,34 +1340,23 @@ components:
          local:
            type: boolean
          downtime_ms:
@@ -1095,7 +1110,7 @@ index 2637e15..d57ce89 100644
      VmAddUserDevice:
        required:
          - socket
-@@ -1488,12 +1348,9 @@ components:
+@@ -1508,12 +1365,9 @@ components:
          socket:
            type: string
          pci_segment:

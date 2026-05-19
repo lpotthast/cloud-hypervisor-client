@@ -37,7 +37,7 @@ pub struct VmConfig {
     #[serde(rename = "pmem", skip_serializing_if = "Option::is_none")]
     pub pmem: Option<Vec<models::PmemConfig>>,
     #[serde(rename = "serial", skip_serializing_if = "Option::is_none")]
-    pub serial: Option<models::ConsoleConfig>,
+    pub serial: Option<models::SerialConfig>,
     #[serde(rename = "console", skip_serializing_if = "Option::is_none")]
     pub console: Option<models::ConsoleConfig>,
     #[serde(rename = "debug_console", skip_serializing_if = "Option::is_none")]

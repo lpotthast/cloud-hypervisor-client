@@ -12,33 +12,21 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ConsoleConfig {
+pub struct SerialConfig {
     #[serde(rename = "file", skip_serializing_if = "Option::is_none")]
     pub file: Option<String>,
     #[serde(rename = "socket", skip_serializing_if = "Option::is_none")]
     pub socket: Option<String>,
     #[serde(rename = "mode")]
     pub mode: models::ConsoleMode,
-    #[serde(rename = "iommu", skip_serializing_if = "Option::is_none")]
-    pub iommu: Option<bool>,
-    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    #[serde(rename = "pci_segment", skip_serializing_if = "Option::is_none")]
-    pub pci_segment: Option<i16>,
-    #[serde(rename = "pci_device_id", skip_serializing_if = "Option::is_none")]
-    pub pci_device_id: Option<u8>,
 }
 
-impl ConsoleConfig {
-    pub fn new(mode: models::ConsoleMode) -> ConsoleConfig {
-        ConsoleConfig {
+impl SerialConfig {
+    pub fn new(mode: models::ConsoleMode) -> SerialConfig {
+        SerialConfig {
             file: None,
             socket: None,
             mode,
-            iommu: None,
-            id: None,
-            pci_segment: None,
-            pci_device_id: None,
         }
     }
 }

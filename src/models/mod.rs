@@ -66,6 +66,8 @@ pub mod rng_config;
 pub use self::rng_config::RngConfig;
 pub mod send_migration_data;
 pub use self::send_migration_data::SendMigrationData;
+pub mod serial_config;
+pub use self::serial_config::SerialConfig;
 pub mod timeout_strategy;
 pub use self::timeout_strategy::TimeoutStrategy;
 pub mod token_bucket;
